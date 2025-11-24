@@ -119,6 +119,15 @@ async function retrieveForNotifications(req, res, next) {
 
     const mentionedEmails = extractMentionedEmails(notification);
 
+    await Promise.all(
+      mentionedEmails.map((email) =>
+        Student.findOrCreate({
+          where: { email },
+          defaults: { suspended: false },
+        })
+      )
+    );
+
     const registeredStudents = await teacherRecord.getStudents({ where: { suspended: false } });
 
     const allCandidateEmails = new Set([
